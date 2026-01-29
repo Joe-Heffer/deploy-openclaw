@@ -1,0 +1,109 @@
+# Contributing to Moltbot Deployment
+
+Thank you for your interest in contributing to the Moltbot deployment repository. This guide covers how to get started, the development workflow, and project conventions.
+
+## Repository Scope
+
+This repository contains **deployment scripts, CI/CD workflows, and documentation** for running [Moltbot](https://molt.bot) on Linux VPS. It does not contain the Moltbot application itself (which is installed via npm).
+
+Key areas you can contribute to:
+
+- **Deployment scripts** (`deploy/`) — Bash scripts for installing, updating, and managing Moltbot
+- **CI/CD workflows** (`.github/workflows/`) — GitHub Actions for automated deployment and linting
+- **Documentation** (`docs/`, `README.md`) — Guides, use cases, and reference material
+
+## Getting Started
+
+1. **Fork** the repository on GitHub
+2. **Clone** your fork locally:
+   ```bash
+   git clone https://github.com/<your-username>/moltbot.git
+   cd moltbot
+   ```
+3. **Create a branch** for your changes:
+   ```bash
+   git checkout -b your-branch-name
+   ```
+
+## Development Guidelines
+
+### Bash Scripts
+
+All deployment scripts live in `deploy/` and must pass [ShellCheck](https://www.shellcheck.net/) at warning severity.
+
+- Source the shared library for logging and utilities:
+  ```bash
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  source "${SCRIPT_DIR}/lib.sh"
+  ```
+- Use `log_info`, `log_success`, `log_warn`, and `log_error` from `deploy/lib.sh` for output
+- Use `require_root` to enforce root privileges where needed
+- Use `validate_port` for port number validation
+- Quote variables and use `set -euo pipefail` at the top of scripts
+- Support both Debian/Ubuntu and RHEL-family distributions where applicable
+
+### GitHub Actions Workflows
+
+Workflows in `.github/workflows/` must pass [actionlint](https://github.com/rhysd/actionlint) and [yamllint](https://github.com/adrienverge/yamllint).
+
+- Pin actions to full commit SHAs with a version comment (e.g., `uses: actions/checkout@<sha> # v4`)
+- Keep YAML lines under 200 characters
+
+### Documentation
+
+- Use standard Markdown (GitHub-flavored)
+- Place detailed guides in `docs/` and link them from `docs/README.md`
+- Keep the top-level `README.md` focused on quick start and essential reference
+
+## Linting
+
+The CI pipeline runs three linters on every push to `main` and on all pull requests:
+
+| Linter | Scope | What it checks |
+|--------|-------|----------------|
+| **ShellCheck** | `deploy/*.sh` | Bash script correctness and best practices |
+| **actionlint** | `.github/workflows/` | GitHub Actions workflow syntax |
+| **yamllint** | All `.yml` files | YAML formatting (200-char line limit) |
+
+Run ShellCheck locally before submitting:
+
+```bash
+shellcheck deploy/*.sh
+```
+
+## Submitting Changes
+
+1. **Ensure linters pass** — ShellCheck, actionlint, and yamllint must all pass
+2. **Write clear commit messages** — Use imperative mood, include context:
+   - `Fix OOM kill during npm install on low-memory VPS`
+   - `Add use cases and deployment guide documentation`
+   - `Improve code quality, robustness, and security across deploy scripts`
+3. **Open a pull request** against `main` with a description of what changed and why
+4. **Keep PRs focused** — One logical change per pull request
+
+## Reporting Issues
+
+If you find a bug or have a suggestion, please [open an issue](https://github.com/Joe-Heffer/moltbot/issues) with:
+
+- A clear title describing the problem
+- Steps to reproduce (if applicable)
+- Your environment (OS, Node.js version, RAM)
+- Relevant logs (`sudo journalctl -u moltbot-gateway -n 50`)
+
+## Testing Changes
+
+Since this repository contains deployment scripts (not application code), testing typically involves:
+
+- **Linting**: Run ShellCheck on modified scripts
+- **Manual testing**: Test scripts on a fresh Ubuntu 24.04 VPS or VM (1-4 GB RAM)
+- **CI verification**: Push to your fork and verify GitHub Actions pass
+
+## Security
+
+If you discover a security vulnerability, please report it responsibly. Do **not** open a public issue. Instead, contact the maintainer directly.
+
+See [docs/SECURITY.md](docs/SECURITY.md) for the project's security model and hardening recommendations.
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
