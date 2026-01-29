@@ -83,6 +83,40 @@ wait_for_healthy() {
     return 1
 }
 
+retune_service_resources() {
+    local service_file="/etc/systemd/system/${SERVICE_NAME}.service"
+    if [[ ! -f "$service_file" ]]; then
+        log_warn "Service file not found at ${service_file}, skipping resource re-tune"
+        return 0
+    fi
+
+    compute_memory_limits
+
+    # Extract current values from the service file
+    local current_heap
+    current_heap=$(sed -n 's/.*--max-old-space-size=\([0-9]*\).*/\1/p' "$service_file")
+    local current_memmax
+    current_memmax=$(sed -n 's/^MemoryMax=\(.*\)/\1/p' "$service_file")
+
+    # Skip if already optimal
+    if [[ "$current_heap" == "$LIB_NODE_HEAP_SIZE" ]] && \
+       [[ "$current_memmax" == "$LIB_MEMORY_MAX" ]]; then
+        log_info "Service resource limits already optimal (heap=${LIB_NODE_HEAP_SIZE}M, MemoryMax=${LIB_MEMORY_MAX})"
+        return 0
+    fi
+
+    log_info "Re-tuning service resource limits for current system memory..."
+    [[ -n "$current_heap" ]] && log_info "  Node.js heap: ${current_heap}M → ${LIB_NODE_HEAP_SIZE}M"
+    [[ -n "$current_memmax" ]] && log_info "  MemoryMax: ${current_memmax} → ${LIB_MEMORY_MAX}"
+
+    # Update the service file in place
+    sed -i "s/--max-old-space-size=[0-9]*/--max-old-space-size=${LIB_NODE_HEAP_SIZE}/" "$service_file"
+    sed -i "s/^MemoryMax=.*/MemoryMax=${LIB_MEMORY_MAX}/" "$service_file"
+
+    systemctl daemon-reload
+    log_success "Service resource limits updated"
+}
+
 show_status() {
     echo ""
     log_info "Current status:"
@@ -102,6 +136,7 @@ main() {
     validate_port "$MOLTBOT_PORT" "MOLTBOT_PORT"
     check_user_exists
     update_moltbot
+    retune_service_resources
     restart_service
 
     if wait_for_healthy; then

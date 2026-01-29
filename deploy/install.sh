@@ -63,24 +63,11 @@ detect_resources() {
         log_info "Applying low-memory optimizations automatically"
     fi
 
-    # Set MemoryMax to 75% of total RAM, capped at 2G
-    local ram_75pct=$(( TOTAL_RAM_MB * 75 / 100 ))
-    if [[ "$ram_75pct" -ge 2048 ]]; then
-        MEMORY_MAX="2G"
-    else
-        MEMORY_MAX="${ram_75pct}M"
-    fi
-
-    # Set Node.js max-old-space-size to 50% of total RAM, capped at 1536 MB
-    local heap_size=$(( TOTAL_RAM_MB * 50 / 100 ))
-    if [[ "$heap_size" -gt 1536 ]]; then
-        heap_size=1536
-    fi
-    # Floor at 128 MB to avoid startup failures
-    if [[ "$heap_size" -lt 128 ]]; then
-        heap_size=128
-    fi
-    NODE_HEAP_SIZE="$heap_size"
+    # Compute V8 heap and systemd MemoryMax from available RAM.
+    # See compute_memory_limits() in lib.sh for the formula.
+    compute_memory_limits
+    MEMORY_MAX="$LIB_MEMORY_MAX"
+    NODE_HEAP_SIZE="$LIB_NODE_HEAP_SIZE"
 
     log_info "Systemd MemoryMax: ${MEMORY_MAX}"
     log_info "Node.js heap limit: ${NODE_HEAP_SIZE} MB"

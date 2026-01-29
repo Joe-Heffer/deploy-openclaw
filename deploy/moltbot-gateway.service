@@ -36,9 +36,11 @@ RestrictSUIDSGID=yes
 LockPersonality=yes
 
 # Resource limits
-# NOTE: install.sh auto-tunes MemoryMax (75% of RAM, max 2G) and
-# NODE_OPTIONS --max-old-space-size (50% of RAM, max 1536M) based on
-# detected system memory. The values below are defaults for 4GB+ systems.
+# NOTE: install.sh and update.sh auto-tune MemoryMax and --max-old-space-size
+# based on detected system memory (see compute_memory_limits in lib.sh).
+# Formula: heap = 65% RAM (floor 256M, cap 1536M)
+#          MemoryMax = heap + 512M overhead (floor 512M, cap 2G, ≤ 90% RAM)
+# The values below are static defaults for 4 GB+ systems.
 LimitNOFILE=65535
 MemoryMax=2G
 
