@@ -157,8 +157,22 @@ create_moltbot_user() {
 install_moltbot() {
     log_info "Installing moltbot..."
 
-    # Install moltbot as the moltbot user (.bashrc sets up PATH)
-    sudo -u "$MOLTBOT_USER" -i npm install -g moltbot@latest
+    # Install moltbot as the moltbot user (-i loads login shell which sets HOME)
+    # Use @beta tag: the @latest (v0.1.0) tag is a placeholder package
+    # missing the "bin" field, so npm creates no executable.
+    # See https://github.com/moltbot/moltbot/issues/3787
+    sudo -u "$MOLTBOT_USER" -i npm install -g moltbot@beta
+
+    # Verify binary was installed to the correct location
+    if [[ ! -x "${MOLTBOT_HOME}/.npm-global/bin/moltbot" ]]; then
+        log_error "moltbot binary not found at ${MOLTBOT_HOME}/.npm-global/bin/moltbot"
+        log_error "npm prefix may not be configured correctly"
+        log_error "Contents of ${MOLTBOT_HOME}/.npmrc:"
+        cat "${MOLTBOT_HOME}/.npmrc" 2>/dev/null || echo "(file not found)"
+        log_error "npm global prefix reported by npm:"
+        sudo -u "$MOLTBOT_USER" -i npm prefix -g 2>/dev/null || echo "(unable to determine)"
+        exit 1
+    fi
 
     # Verify the binary was linked correctly
     if [[ ! -x "${MOLTBOT_HOME}/.npm-global/bin/moltbot" ]]; then
