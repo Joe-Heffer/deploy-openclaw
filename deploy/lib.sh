@@ -96,3 +96,50 @@ remove_temp_swap() {
         log_info "Temporary swap file removed"
     fi
 }
+
+# Compute memory limits for the moltbot-gateway systemd service.
+# Sets two globals:
+#   LIB_NODE_HEAP_SIZE  — V8 --max-old-space-size in MB
+#   LIB_MEMORY_MAX      — systemd MemoryMax value (e.g. "1024M" or "2G")
+#
+# The gateway idles at ~200 MB V8 heap but can spike above 400 MB under
+# load (channel reconnects, large message bursts).  Node.js also uses
+# 150–300 MB of native memory (buffers, libuv, OpenSSL, etc.) on top of
+# the V8 heap.  The formulas below ensure that:
+#   1. V8 gets enough room to handle spikes without heap OOM.
+#   2. systemd MemoryMax leaves headroom for native overhead so the
+#      cgroup OOM-killer doesn't fire before V8 can GC.
+LIB_NODE_HEAP_SIZE=""
+LIB_MEMORY_MAX=""
+
+compute_memory_limits() {
+    local total_ram_mb
+    total_ram_mb=$(awk '/^MemTotal:/ { printf "%d", $2 / 1024 }' /proc/meminfo)
+
+    # V8 heap: 65% of RAM, floor 256 MB, cap 1536 MB
+    local heap_size=$(( total_ram_mb * 65 / 100 ))
+    if [[ "$heap_size" -gt 1536 ]]; then
+        heap_size=1536
+    fi
+    if [[ "$heap_size" -lt 256 ]]; then
+        heap_size=256
+    fi
+    LIB_NODE_HEAP_SIZE="$heap_size"
+
+    # MemoryMax: heap + 512 MB overhead for native memory (buffers, libuv,
+    # OpenSSL, etc.), but never more than 90% of total RAM so the OS and
+    # other services still have room.  Floor 512 MB, cap 2 GB.
+    local mem_max_mb=$(( heap_size + 512 ))
+    local ram_90pct=$(( total_ram_mb * 90 / 100 ))
+    if [[ "$mem_max_mb" -gt "$ram_90pct" ]]; then
+        mem_max_mb="$ram_90pct"
+    fi
+    if [[ "$mem_max_mb" -lt 512 ]]; then
+        mem_max_mb=512
+    fi
+    if [[ "$mem_max_mb" -ge 2048 ]]; then
+        LIB_MEMORY_MAX="2G"
+    else
+        LIB_MEMORY_MAX="${mem_max_mb}M"
+    fi
+}
