@@ -79,7 +79,7 @@ jobs:
                   chown ${{ env.MOLTBOT_USER }}:${{ env.MOLTBOT_USER }} /home/${{ env.MOLTBOT_USER }}/.npmrc
                   echo "Fixed: wrote npm prefix to .npmrc"
                 fi
-                sudo su - ${{ env.MOLTBOT_USER }} -c "npm install -g moltbot@latest"
+                sudo su - ${{ env.MOLTBOT_USER }} -c "npm install -g moltbot@beta"
                 # Verify binary exists before restarting service
                 ls -la /home/${{ env.MOLTBOT_USER }}/.npm-global/bin/moltbot
                 sudo systemctl restart moltbot-gateway || echo "Service not yet configured"

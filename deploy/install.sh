@@ -163,7 +163,10 @@ install_moltbot() {
     log_info "Installing moltbot..."
 
     # Install moltbot as the moltbot user (-i loads login shell which sets HOME)
-    sudo -u "$MOLTBOT_USER" -i npm install -g moltbot@latest
+    # Use @beta tag: the @latest (v0.1.0) tag is a placeholder package
+    # missing the "bin" field, so npm creates no executable.
+    # See https://github.com/moltbot/moltbot/issues/3787
+    sudo -u "$MOLTBOT_USER" -i npm install -g moltbot@beta
 
     # Verify binary was installed to the correct location
     if [[ ! -x "${MOLTBOT_HOME}/.npm-global/bin/moltbot" ]]; then

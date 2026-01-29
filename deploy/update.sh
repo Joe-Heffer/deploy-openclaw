@@ -51,7 +51,7 @@ update_moltbot() {
     # Update via npm
     sudo -u "$MOLTBOT_USER" -i bash -c '
         export PATH="${HOME}/.npm-global/bin:${PATH}"
-        npm update -g moltbot
+        npm install -g moltbot@beta
     '
 
     NEW_VERSION=$(get_current_version)
