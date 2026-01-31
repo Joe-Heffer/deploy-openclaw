@@ -1,6 +1,6 @@
-# Moltbot Documentation
+# OpenClaw Documentation
 
-Welcome to the Moltbot documentation. This directory contains guides for use cases, deployment options, security, community applications, and cost information.
+Welcome to the OpenClaw documentation. This directory contains guides for use cases, deployment options, security, community applications, and cost information.
 
 ## Official Documentation
 
@@ -10,10 +10,10 @@ The primary source for OpenClaw/Moltbot documentation is:
 ## Quick Links
 
 ### Getting Started
-- **[Official Getting Started Guide](https://docs.openclaw.ai)** - Complete installation and onboarding
-- **[Deployment Guide](./DEPLOYMENT.md)** - How to deploy Moltbot across different platforms
+- **[Official Documentation](https://docs.openclaw.ai/start/getting-started)** - Complete getting started guide
+- **[Deployment Guide](./DEPLOYMENT.md)** - How to deploy OpenClaw across different platforms
 
-### Understanding Moltbot
+### Understanding OpenClaw
 - **[Use Cases](./USE_CASES.md)** - Real-world applications and workflows
   - Personal productivity (calendar, email, tasks)
   - Developer and DevOps workflows
@@ -26,7 +26,7 @@ The primary source for OpenClaw/Moltbot documentation is:
   - Notable use cases and examples
   - Skills ecosystem overview
 
-### Running Moltbot
+### Running OpenClaw
 - **[Gateway UI Setup](./GATEWAY_UI.md)** - Access and configure the web interface
 - **[Deployment Options](./DEPLOYMENT.md)** - Choose the right setup for you
   - Linux VPS (recommended for production)
@@ -40,7 +40,7 @@ The primary source for OpenClaw/Moltbot documentation is:
   - Security best practices
   - Hardening recommendations
 
-- **[Telegram Setup](./TELEGRAM_SETUP.md)** - Connect Moltbot to Telegram via BotFather
+- **[Telegram Setup](./TELEGRAM_SETUP.md)** - Connect OpenClaw to Telegram via BotFather
   - Creating a bot and obtaining a token
   - Configuring the token on your server
   - Security considerations
@@ -74,9 +74,9 @@ For detailed instructions, see [Deployment Guide](./DEPLOYMENT.md).
 
 ## Community & Support
 
-- **[Awesome Moltbot Skills](https://github.com/VoltAgent/awesome-moltbot-skills)** - 700+ community skills
-- **[Official GitHub](https://github.com/moltbot/moltbot)** - Source code and issues
-- **[Skills Marketplace](https://docs.molt.bot/tools/skills)** - Discover and install skills
+- **[Awesome OpenClaw Skills](https://github.com/VoltAgent/awesome-moltbot-skills)** - 700+ community skills
+- **[Official GitHub](https://github.com/openclaw/openclaw)** - Source code and issues
+- **[Skills Marketplace](https://docs.openclaw.ai/tools/skills)** - Discover and install skills
 
 ## Security First
 

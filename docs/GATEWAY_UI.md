@@ -1,10 +1,10 @@
 # Gateway UI Setup
 
-The Moltbot Gateway includes a built-in web interface for managing your bot, monitoring activity, and configuring channels. This guide explains how to access and set up the Gateway UI after installation.
+The OpenClaw Gateway includes a built-in web interface for managing your bot, monitoring activity, and configuring channels. This guide explains how to access and set up the Gateway UI after installation.
 
 ## Prerequisites
 
-- Moltbot installed and running (see [Deployment Guide](./DEPLOYMENT.md))
+- OpenClaw installed and running (see [Deployment Guide](./DEPLOYMENT.md))
 - The `moltbot-gateway` systemd service started
 - Network access to your VM on port 18789
 
@@ -33,7 +33,7 @@ http://<your-vm-ip>:18789
 
 Replace `<your-vm-ip>` with the public IP address of your VPS. For example, if your server IP is `203.0.113.50`, visit `http://203.0.113.50:18789`.
 
-If you are running Moltbot locally, use:
+If you are running OpenClaw locally, use:
 
 ```
 http://localhost:18789
@@ -41,7 +41,7 @@ http://localhost:18789
 
 ## Authentication
 
-The Gateway UI is protected by a token. The onboarding wizard (`moltbot onboard`) generates this token automatically and stores it in the Moltbot config file at `/home/moltbot/.moltbot/moltbot.json` under the key `gateway.auth.token`.
+The Gateway UI is protected by a token. The onboarding wizard (`moltbot onboard`) generates this token automatically and stores it in the OpenClaw config file at `/home/moltbot/.moltbot/moltbot.json` under the key `gateway.auth.token`.
 
 ### Finding Your Token
 
@@ -143,7 +143,7 @@ Exposing the gateway port directly to the internet is not recommended for produc
 
 ### Tailscale Serve / Funnel (Recommended)
 
-[Tailscale](https://tailscale.com/) provides encrypted access to your gateway without opening ports publicly. Moltbot has built-in Tailscale support:
+[Tailscale](https://tailscale.com/) provides encrypted access to your gateway without opening ports publicly. OpenClaw has built-in Tailscale support:
 
 ```bash
 # In your .env file
@@ -151,7 +151,7 @@ TAILSCALE_ENABLED=true
 TAILSCALE_MODE=serve    # "serve" for tailnet-only, "funnel" for public HTTPS
 ```
 
-See the official documentation for details: [Tailscale integration](https://docs.molt.bot/gateway/tailscale).
+See the official documentation for details: [Tailscale integration](https://docs.openclaw.ai/gateway/tailscale).
 
 ### SSH Tunnel
 
@@ -193,7 +193,7 @@ Then visit `http://localhost:18789` in your browser as usual.
 
 ### Reverse Proxy
 
-Place the gateway behind a reverse proxy (nginx, Caddy) with TLS termination for HTTPS access. See the official documentation for configuration examples: [Gateway security](https://docs.molt.bot/gateway/security).
+Place the gateway behind a reverse proxy (nginx, Caddy) with TLS termination for HTTPS access. See the official documentation for configuration examples: [Gateway security](https://docs.openclaw.ai/gateway/security).
 
 ## Troubleshooting
 
@@ -228,8 +228,8 @@ sudo -u moltbot -i moltbot doctor
 
 ## Further Reading
 
-- [Official Moltbot Documentation](https://docs.molt.bot)
-- [Gateway Overview](https://docs.molt.bot/gateway)
-- [Gateway Security](https://docs.molt.bot/gateway/security)
-- [Tailscale Integration](https://docs.molt.bot/gateway/tailscale)
-- [Channels Configuration](https://docs.molt.bot/channels)
+- [Official OpenClaw Documentation](https://docs.openclaw.ai)
+- [Gateway Overview](https://docs.openclaw.ai/gateway)
+- [Gateway Security](https://docs.openclaw.ai/gateway/security)
+- [Tailscale Integration](https://docs.openclaw.ai/gateway/tailscale)
+- [Channels Configuration](https://docs.openclaw.ai/channels)

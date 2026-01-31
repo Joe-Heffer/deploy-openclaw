@@ -1,14 +1,14 @@
-# Contributing to Moltbot Deployment
+# Contributing to OpenClaw Deployment
 
-Thank you for your interest in contributing to the Moltbot deployment repository. This guide covers how to get started, the development workflow, and project conventions.
+Thank you for your interest in contributing to the OpenClaw deployment repository. This guide covers how to get started, the development workflow, and project conventions.
 
 ## Repository Scope
 
-This repository contains **deployment scripts, CI/CD workflows, and documentation** for running [Moltbot](https://molt.bot) on Linux VPS. It does not contain the Moltbot application itself (which is installed via npm).
+This repository contains **deployment scripts, CI/CD workflows, and documentation** for running [OpenClaw](https://openclaw.ai) on Linux VPS. It does not contain the OpenClaw application itself (which is installed via npm).
 
 Key areas you can contribute to:
 
-- **Deployment scripts** (`deploy/`) — Bash scripts for installing, updating, and managing Moltbot
+- **Deployment scripts** (`deploy/`) — Bash scripts for installing, updating, and managing OpenClaw
 - **CI/CD workflows** (`.github/workflows/`) — GitHub Actions for automated deployment and linting
 - **Documentation** (`docs/`, `README.md`) — Guides, use cases, and reference material
 
@@ -144,7 +144,7 @@ See [RELEASING.md](RELEASING.md) for more details on versioning and releases.
 
 ## Reporting Issues
 
-If you find a bug or have a suggestion, please [open an issue](https://github.com/Joe-Heffer/moltbot/issues) with:
+If you find a bug or have a suggestion, please [open an issue](https://github.com/openclaw/openclaw-deploy/issues) with:
 
 - A clear title describing the problem
 - Steps to reproduce (if applicable)

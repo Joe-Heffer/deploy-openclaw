@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues when running Moltbot on a Linux VPS and how to resolve them.
+Common issues when running OpenClaw on a Linux VPS and how to resolve them.
 
 ## Checking Logs
 
@@ -29,7 +29,7 @@ sudo systemctl status moltbot-gateway
 **Symptom:** You message the bot on Telegram and it replies:
 
 ```
-Moltbot: access not configured.
+OpenClaw: access not configured.
 
 Your Telegram user id: 123456789
 
@@ -65,7 +65,7 @@ Error: Channel required. Use --channel <channel> or pass it as the first argumen
 
 The `(expected one of: )` list is empty — no channels are registered for pairing.
 
-**Cause:** This is a known bug in Moltbot v2026.1.27-beta.1. The Telegram bot sends a pairing prompt, but the `moltbot pairing` CLI does not register Telegram as a supported pairing channel, so there is no way to approve the code.
+**Cause:** This is a known bug in OpenClaw v2026.1.27-beta.1. The Telegram bot sends a pairing prompt, but the `moltbot pairing` CLI does not register Telegram as a supported pairing channel, so there is no way to approve the code.
 
 **Workaround:** Set `DM_POLICY=open` to bypass pairing entirely:
 
@@ -89,7 +89,7 @@ The bot will now respond to all Telegram messages without requiring approval. Sw
 
 ### "Unknown target" phone number error on Telegram
 
-**Symptom:** Moltbot returns an error when trying to send a Telegram message:
+**Symptom:** OpenClaw returns an error when trying to send a Telegram message:
 
 ```json
 {
