@@ -196,7 +196,7 @@ The Gateway UI requires an authentication token. The onboarding wizard (`moltbot
 To retrieve the token:
 
 ```bash
-sudo -u moltbot -i cat /home/moltbot/.clawdbot/moltbot.json | jq -r '.gateway.auth.token'
+sudo -u moltbot -i cat /home/moltbot/.moltbot/moltbot.json | jq -r '.gateway.auth.token'
 ```
 
 Then open the Gateway UI with the token as a query parameter:
