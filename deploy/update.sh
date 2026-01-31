@@ -46,7 +46,7 @@ update_moltbot() {
     ensure_swap_for_install
 
     # Update via npm (-i sources .profile which sets PATH to include .npm-global/bin)
-    sudo -u "$MOLTBOT_USER" -i npm install -g moltbot@beta
+    sudo -u "$MOLTBOT_USER" -i npm install -g openclaw@latest
 
     remove_temp_swap
 

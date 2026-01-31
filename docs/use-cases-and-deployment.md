@@ -134,15 +134,16 @@ Moltbot on a Linux VPS. It is the recommended approach for always-on
 operation.
 
 **Supported operating systems:**
+
 - Ubuntu / Debian
 - RHEL / Oracle Linux
 
 **Hardware requirements** (see [official system requirements](https://docs.molt.bot/help/faq)):
 
-| RAM | MemoryMax | Node.js Heap | Notes |
-|-----|-----------|-------------|-------|
-| 2 GB | 1.5 GB | 1 GB | Minimum; consider adding swap |
-| 4+ GB | 2 GB | 1.5 GB | Recommended; comfortable headroom |
+| RAM   | MemoryMax | Node.js Heap | Notes                             |
+| ----- | --------- | ------------ | --------------------------------- |
+| 2 GB  | 1.5 GB    | 1 GB         | Minimum; consider adding swap     |
+| 4+ GB | 2 GB      | 1.5 GB       | Recommended; comfortable headroom |
 
 The installer auto-tunes resource limits based on detected RAM.
 
@@ -207,7 +208,7 @@ for architecture details.
 For development or personal use on your own workstation:
 
 ```bash
-npm install -g moltbot@latest
+npm install -g openclaw@latest
 moltbot onboard --install-daemon
 ```
 
@@ -216,11 +217,13 @@ get additional capabilities including camera access, screen recording,
 location services, and native voice support.
 
 **Supported platforms:**
+
 - macOS (Intel and Apple Silicon)
 - Linux (x86_64 and ARM64)
 - Windows via WSL2
 
 Guides for local setups:
+
 - [Beebom: Mac Mini setup](https://beebom.com/how-to-set-up-clawdbot-moltbot-on-mac-mini/)
 - [Medium: Local setup walkthrough](https://kasata.medium.com/how-to-set-up-moltbot-your-personal-ai-assistant-running-locally-on-your-computer-5f9b932e4793)
 
@@ -291,6 +294,7 @@ project's RAK threat framework identify three primary risk vectors:
    update workflow regularly to pick up security patches.
 
 For in-depth security analysis, see:
+
 - [1Password: It's Incredible. It's Terrifying. It's MoltBot.](https://1password.com/blog/its-moltbot)
 - [Cisco: Personal AI Agents Like Moltbot Are a Security Nightmare](https://blogs.cisco.com/ai/personal-ai-agents-like-moltbot-are-a-security-nightmare)
 - [GitGuardian: Moltbot Goes Viral -- And So Do Your Secrets](https://blog.gitguardian.com/moltbot-personal-assistant-goes-viral-and-so-do-your-secrets/)
@@ -332,20 +336,20 @@ repository catalogues 700+ skills across 28 categories.
 
 ### Skills ecosystem by category
 
-| Category | Skills | Examples |
-|----------|--------|---------|
-| DevOps and Cloud | 41 | Azure CLI, Docker, Kubernetes, Vercel |
-| CLI Utilities | 41 | DuckDB, jq, tmux, unit conversion |
-| Productivity | 41 | Notion, Todoist, Linear, Jira |
-| Notes and PKM | 44 | Obsidian, Logseq, Bear, Apple Notes |
-| AI and LLMs | 38 | Multi-model orchestration, Ollama |
-| Smart Home | 31 | Home Assistant, Tesla, thermostats |
-| Transportation | 34 | Tesla, flight check-in |
-| Finance | 29 | Budgeting, crypto tracking |
-| Media | 29 | YouTube, Spotify, Plex |
-| Health and Fitness | 26 | Apple Health, workout tracking |
-| Communication | 26 | Email, messaging, voice |
-| Search and Research | 23 | Brave Search, Exa AI, Kagi, Tavily |
+| Category            | Skills | Examples                              |
+| ------------------- | ------ | ------------------------------------- |
+| DevOps and Cloud    | 41     | Azure CLI, Docker, Kubernetes, Vercel |
+| CLI Utilities       | 41     | DuckDB, jq, tmux, unit conversion     |
+| Productivity        | 41     | Notion, Todoist, Linear, Jira         |
+| Notes and PKM       | 44     | Obsidian, Logseq, Bear, Apple Notes   |
+| AI and LLMs         | 38     | Multi-model orchestration, Ollama     |
+| Smart Home          | 31     | Home Assistant, Tesla, thermostats    |
+| Transportation      | 34     | Tesla, flight check-in                |
+| Finance             | 29     | Budgeting, crypto tracking            |
+| Media               | 29     | YouTube, Spotify, Plex                |
+| Health and Fitness  | 26     | Apple Health, workout tracking        |
+| Communication       | 26     | Email, messaging, voice               |
+| Search and Research | 23     | Brave Search, Exa AI, Kagi, Tavily    |
 
 See the full directory at [docs.molt.bot/tools/skills](https://docs.molt.bot/tools/skills).
 
@@ -356,11 +360,11 @@ See the full directory at [docs.molt.bot/tools/skills](https://docs.molt.bot/too
 Moltbot itself is free and open source (MIT license). The primary ongoing cost
 is LLM API usage:
 
-| Usage Level | Monthly Estimate | Typical Profile |
-|-------------|-----------------|-----------------|
-| Light | $10 -- $30 | Occasional queries, simple tasks |
-| Moderate | $30 -- $70 | Daily use, multi-channel, background tasks |
-| Heavy | $70 -- $150 | Continuous operation, multi-agent workflows |
+| Usage Level | Monthly Estimate | Typical Profile                             |
+| ----------- | ---------------- | ------------------------------------------- |
+| Light       | $10 -- $30       | Occasional queries, simple tasks            |
+| Moderate    | $30 -- $70       | Daily use, multi-channel, background tasks  |
+| Heavy       | $70 -- $150      | Continuous operation, multi-agent workflows |
 
 Anthropic's Claude Pro or Max subscriptions can be used as an alternative to
 per-token API billing. VPS hosting adds $4 -- $24/month depending on provider
@@ -371,18 +375,21 @@ and RAM. Cloudflare Workers deployment runs at approximately $5/month.
 ## Further Reading
 
 ### Official resources
+
 - [Official documentation](https://docs.molt.bot/start/getting-started)
 - [Security guide](https://docs.molt.bot/gateway/security)
 - [Skills documentation](https://docs.molt.bot/tools/skills)
 - [GitHub repository](https://github.com/moltbot/moltbot)
 
 ### Tutorials
+
 - [DigitalOcean quickstart](https://www.digitalocean.com/community/tutorials/moltbot-quickstart-guide)
 - [DataCamp: Control your PC from WhatsApp](https://www.datacamp.com/tutorial/moltbot-clawdbot-tutorial)
 - [Hostinger VPS installation](https://www.hostinger.com/support/how-to-install-moltbot-on-hostinger-vps/)
 - [AI Fire: Install and use guide](https://www.aifire.co/p/moltbot-guide-how-to-install-use-the-viral-ai-agent)
 
 ### Analysis and commentary
+
 - [TechCrunch: Everything you need to know](https://techcrunch.com/2026/01/27/everything-you-need-to-know-about-viral-personal-ai-assistant-clawdbot-now-moltbot/)
 - [DEV Community: Ultimate personal AI assistant guide](https://dev.to/czmilo/moltbot-the-ultimate-personal-ai-assistant-guide-for-2026-d4e)
 - [ChatPRD: 24 hours with Moltbot](https://www.chatprd.ai/how-i-ai/24-hours-with-clawdbot-moltbot-3-workflows-for-ai-agent)

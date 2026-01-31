@@ -230,7 +230,7 @@ install_moltbot() {
     # Use @beta tag: the @latest (v0.1.0) tag is a placeholder package
     # missing the "bin" field, so npm creates no executable.
     # See https://github.com/moltbot/moltbot/issues/3787
-    sudo -u "$MOLTBOT_USER" -i npm install -g moltbot@beta
+    sudo -u "$MOLTBOT_USER" -i npm install -g openclaw@latest
 
     remove_temp_swap
 
