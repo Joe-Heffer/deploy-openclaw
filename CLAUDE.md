@@ -4,7 +4,7 @@ This file provides context for AI assistants working on this repository.
 
 ## Project Overview
 
-Moltbot deployment repository — Bash scripts, CI/CD workflows, and documentation for running [Moltbot](https://molt.bot) on Linux VPS. This repo does **not** contain the Moltbot application itself (installed via `npm install -g moltbot`).
+OpenClaw deployment repository — Bash scripts, CI/CD workflows, and documentation for running [OpenClaw](https://openclaw.ai) on Linux VPS. This repo does **not** contain the OpenClaw application itself (installed via `npm install -g moltbot`).
 
 ## Repository Structure
 

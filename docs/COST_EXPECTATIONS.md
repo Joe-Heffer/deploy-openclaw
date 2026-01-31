@@ -1,6 +1,6 @@
 # Cost Expectations
 
-Moltbot itself is free and open source (MIT license). The primary ongoing cost is LLM API usage:
+OpenClaw itself is free and open source (MIT license). The primary ongoing cost is LLM API usage:
 
 | Usage Level | Monthly Estimate | Typical Profile |
 |-------------|-----------------|-----------------|
