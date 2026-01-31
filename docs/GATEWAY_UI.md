@@ -41,20 +41,20 @@ http://localhost:18789
 
 ## Authentication
 
-The Gateway UI is protected by a token. The onboarding wizard (`moltbot onboard`) generates this token automatically and stores it in the Moltbot config file at `~/.clawdbot/moltbot.json` under the key `gateway.auth.token`.
+The Gateway UI is protected by a token. The onboarding wizard (`moltbot onboard`) generates this token automatically and stores it in the Moltbot config file at `/home/moltbot/.clawdbot/moltbot.json` under the key `gateway.auth.token`.
 
 ### Finding Your Token
 
 Retrieve the token with:
 
 ```bash
-sudo -u moltbot -i cat ~/.clawdbot/moltbot.json | jq -r '.gateway.auth.token'
+sudo -u moltbot -i cat /home/moltbot/.clawdbot/moltbot.json | jq -r '.gateway.auth.token'
 ```
 
 If you don't have `jq` installed, you can read the full config and look for the `gateway.auth.token` value:
 
 ```bash
-sudo -u moltbot -i cat ~/.clawdbot/moltbot.json
+sudo -u moltbot -i cat /home/moltbot/.clawdbot/moltbot.json
 ```
 
 The relevant section looks like:
