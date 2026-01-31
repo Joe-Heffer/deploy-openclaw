@@ -19,6 +19,7 @@ MOLTBOT_HOME="/home/${MOLTBOT_USER}"
 MOLTBOT_CONFIG_DIR="${MOLTBOT_HOME}/.config/moltbot"
 MOLTBOT_DATA_DIR="${MOLTBOT_HOME}/.local/share/moltbot"
 NODE_VERSION="22"
+BREW_PREFIX="/home/linuxbrew/.linuxbrew"
 MOLTBOT_PORT="${MOLTBOT_PORT:-18789}"
 SERVICE_NAME="moltbot-gateway"
 OS_FAMILY=""
@@ -217,8 +218,77 @@ PROFILE
         echo 'export PATH="${HOME}/.npm-global/bin:${PATH}"' >> "${MOLTBOT_HOME}/.profile"
     fi
 
+    # Add Homebrew (Linuxbrew) environment to shell profiles so that
+    # interactive shells (sudo -u moltbot -i) and the moltbot application
+    # can locate the brew binary and brew-installed packages.
+    if ! grep -q "linuxbrew" "${MOLTBOT_HOME}/.bashrc" 2>/dev/null; then
+        cat >> "${MOLTBOT_HOME}/.bashrc" << 'BREWRC'
+
+# Homebrew (Linuxbrew)
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+BREWRC
+    fi
+    if ! grep -q "linuxbrew" "${MOLTBOT_HOME}/.profile" 2>/dev/null; then
+        cat >> "${MOLTBOT_HOME}/.profile" << 'BREWPROFILE'
+
+# Homebrew (Linuxbrew)
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+BREWPROFILE
+    fi
+
     chown -R "${MOLTBOT_USER}:${MOLTBOT_USER}" "$MOLTBOT_HOME"
     log_success "Directories configured"
+}
+
+install_homebrew() {
+    log_info "Installing Homebrew (Linuxbrew)..."
+
+    local brew_bin="${BREW_PREFIX}/bin/brew"
+
+    # Check if Homebrew is already installed
+    if [[ -x "$brew_bin" ]]; then
+        local brew_version
+        brew_version=$(sudo -u "$MOLTBOT_USER" "$brew_bin" --version 2>/dev/null | head -1 || echo "unknown")
+        log_info "Homebrew already installed: ${brew_version}"
+        return 0
+    fi
+
+    # Create the Homebrew prefix directory with moltbot ownership.
+    # Homebrew on Linux installs to /home/linuxbrew/.linuxbrew by convention.
+    mkdir -p "${BREW_PREFIX}"
+    chown -R "${MOLTBOT_USER}:${MOLTBOT_USER}" /home/linuxbrew
+
+    # Install Homebrew via git clone (manual method).
+    # The interactive installer script requires sudo access from the installing
+    # user, which the moltbot system user does not have.  The git clone approach
+    # is the officially documented alternative for automated/non-interactive
+    # environments.
+    if ! sudo -u "$MOLTBOT_USER" git clone https://github.com/Homebrew/brew "${BREW_PREFIX}/Homebrew"; then
+        log_warn "Failed to clone Homebrew repository — skills requiring brew will not work"
+        return 0
+    fi
+
+    sudo -u "$MOLTBOT_USER" mkdir -p "${BREW_PREFIX}/bin"
+    sudo -u "$MOLTBOT_USER" ln -sf ../Homebrew/bin/brew "${brew_bin}"
+
+    # Run initial setup (downloads tap metadata)
+    sudo -u "$MOLTBOT_USER" "${brew_bin}" update --force --quiet || {
+        log_warn "Homebrew initial setup incomplete — run 'brew update' manually to finish"
+    }
+
+    # Verify installation
+    if [[ ! -x "$brew_bin" ]]; then
+        log_warn "Homebrew installation could not be verified — skills requiring brew may not work"
+        return 0
+    fi
+
+    local brew_version
+    brew_version=$(sudo -u "$MOLTBOT_USER" "$brew_bin" --version 2>/dev/null | head -1 || echo "unknown")
+    log_success "Homebrew installed: ${brew_version}"
 }
 
 install_moltbot() {
@@ -287,8 +357,11 @@ Group=${MOLTBOT_USER}
 WorkingDirectory=${MOLTBOT_HOME}
 Environment=NODE_ENV=production
 Environment=NODE_OPTIONS=--max-old-space-size=${NODE_HEAP_SIZE}
-Environment=PATH=${MOLTBOT_HOME}/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PATH=${BREW_PREFIX}/bin:${BREW_PREFIX}/sbin:${MOLTBOT_HOME}/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
 Environment=HOME=${MOLTBOT_HOME}
+Environment=HOMEBREW_PREFIX=${BREW_PREFIX}
+Environment=HOMEBREW_CELLAR=${BREW_PREFIX}/Cellar
+Environment=HOMEBREW_REPOSITORY=${BREW_PREFIX}/Homebrew
 EnvironmentFile=-${MOLTBOT_CONFIG_DIR}/.env
 ExecStartPre=+/bin/sh -c 'mkdir -p ${MOLTBOT_HOME}/.clawdbot ${MOLTBOT_HOME}/clawd/memory && chown -R ${MOLTBOT_USER}:${MOLTBOT_USER} ${MOLTBOT_HOME}/.clawdbot ${MOLTBOT_HOME}/clawd && chmod 700 ${MOLTBOT_HOME}/.clawdbot ${MOLTBOT_HOME}/clawd'
 ExecStartPre=/bin/sh -c 'echo "moltbot-gateway: pre-start checks..." && test -x ${MOLTBOT_HOME}/.npm-global/bin/moltbot || { echo "FATAL: ${MOLTBOT_HOME}/.npm-global/bin/moltbot not found or not executable"; exit 1; } && test -f ${MOLTBOT_CONFIG_DIR}/.env || echo "WARN: ${MOLTBOT_CONFIG_DIR}/.env not found, running without env file"'
@@ -304,7 +377,7 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=${MOLTBOT_CONFIG_DIR} ${MOLTBOT_DATA_DIR} ${MOLTBOT_HOME}/.npm-global ${MOLTBOT_HOME}/.clawdbot ${MOLTBOT_HOME}/clawd
+ReadWritePaths=${MOLTBOT_CONFIG_DIR} ${MOLTBOT_DATA_DIR} ${MOLTBOT_HOME}/.npm-global ${MOLTBOT_HOME}/.clawdbot ${MOLTBOT_HOME}/clawd /home/linuxbrew
 ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes
@@ -520,6 +593,9 @@ main() {
 
     DEPLOY_PHASE="user creation"
     create_moltbot_user
+
+    DEPLOY_PHASE="Homebrew installation"
+    install_homebrew
 
     DEPLOY_PHASE="moltbot installation"
     install_moltbot
