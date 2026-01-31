@@ -213,7 +213,7 @@ sudo bash deploy/update.sh
 
 ### OOM kill during npm install
 
-**Symptom:** `npm install -g moltbot@beta` is killed during the update, or the script hangs and then fails.
+**Symptom:** `npm install -g openclaw` is killed during the update, or the script hangs and then fails.
 
 **Cause:** The VPS has less than 4 GB RAM and npm exhausts available memory during installation.
 
@@ -250,13 +250,13 @@ sudo systemctl restart moltbot-gateway
 
 ## Diagnostic Commands
 
-| Command | Purpose |
-|---------|---------|
-| `sudo journalctl -u moltbot-gateway -n 50` | Last 50 log lines |
-| `sudo journalctl -u moltbot-gateway -f` | Follow logs in real time |
-| `sudo systemctl status moltbot-gateway` | Service status and recent logs |
-| `sudo -u moltbot -i moltbot --version` | Installed moltbot version |
-| `sudo -u moltbot -i moltbot doctor` | Built-in diagnostic check |
-| `sudo ss -tlnp \| grep 18789` | Check if port is in use |
-| `sudo dmesg \| grep -i oom` | Check for OOM kills |
-| `systemctl show moltbot-gateway -p MainPID,ActiveState,SubState,Result` | Detailed service state |
+| Command                                                                 | Purpose                        |
+| ----------------------------------------------------------------------- | ------------------------------ |
+| `sudo journalctl -u moltbot-gateway -n 50`                              | Last 50 log lines              |
+| `sudo journalctl -u moltbot-gateway -f`                                 | Follow logs in real time       |
+| `sudo systemctl status moltbot-gateway`                                 | Service status and recent logs |
+| `sudo -u moltbot -i moltbot --version`                                  | Installed moltbot version      |
+| `sudo -u moltbot -i moltbot doctor`                                     | Built-in diagnostic check      |
+| `sudo ss -tlnp \| grep 18789`                                           | Check if port is in use        |
+| `sudo dmesg \| grep -i oom`                                             | Check for OOM kills            |
+| `systemctl show moltbot-gateway -p MainPID,ActiveState,SubState,Result` | Detailed service state         |
