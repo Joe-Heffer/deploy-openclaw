@@ -52,6 +52,7 @@ The `install.sh` script performs the following:
 4. Installs moltbot globally via npm
 5. Configures a systemd service for automatic startup
 6. Opens port 18789 in the firewall (if firewalld is active)
+7. Sets up AI provider fallback configuration (automatic retry on failures)
 
 ## Directory Structure
 
@@ -61,8 +62,11 @@ deploy/
 ├── update.sh               # Update script for CI/CD
 ├── setup-server.sh         # One-time server preparation for CI/CD
 ├── uninstall.sh            # Removal script
+├── configure-fallbacks.sh  # AI provider fallback configuration script
+├── lib.sh                  # Shared library functions
 ├── moltbot-gateway.service # Systemd service file (reference)
-└── moltbot.env.template    # Environment variable template
+├── moltbot.env.template    # Environment variable template
+└── moltbot.fallbacks.json  # AI provider fallback configuration
 
 .github/workflows/
 ├── deploy.yml              # GitHub Actions deployment workflow (with environment tracking)
@@ -145,6 +149,22 @@ Moltbot is **model-agnostic** and supports multiple AI providers. You can config
 | **Google Gemini** | Alternative | [aistudio.google.com](https://aistudio.google.com/apikey) | Gemini Pro and Ultra models |
 
 Unlike ChatGPT's usage limits, you control your own API keys and rate limits. Multiple providers can be configured simultaneously for redundancy.
+
+#### Automatic Failover
+
+The deployment automatically configures **model fallbacks** based on your available API keys:
+
+1. **Primary Model**: Anthropic Claude Opus 4.5 (if `ANTHROPIC_API_KEY` is set)
+2. **Fallback 1**: OpenAI GPT-4 (if `OPENAI_API_KEY` is set)
+3. **Fallback 2**: Google Gemini Pro (if `GEMINI_API_KEY` is set)
+
+If the primary model fails (rate limits, API errors, etc.), Moltbot automatically switches to the next available fallback. This ensures **continuous operation** even during API outages or rate limiting.
+
+**Customize Fallbacks**: Edit `~/.config/moltbot/moltbot.fallbacks.json` to change the provider priority or add additional models, then run:
+
+```bash
+sudo /opt/moltbot-deployment/deploy/configure-fallbacks.sh
+```
 
 ### 2. Run Onboarding
 

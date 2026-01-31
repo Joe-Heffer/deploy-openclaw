@@ -169,6 +169,19 @@ run_doctor() {
     sudo -u "$MOLTBOT_USER" -i moltbot doctor --repair 2>/dev/null || true
 }
 
+apply_fallback_config() {
+    log_info "Applying AI provider fallback configuration..."
+
+    if [[ -f "${SCRIPT_DIR}/configure-fallbacks.sh" ]]; then
+        # Run fallback configuration script
+        "${SCRIPT_DIR}/configure-fallbacks.sh" || {
+            log_warn "Fallback configuration skipped (may need API keys)"
+        }
+    else
+        log_info "No fallback configuration script found, skipping"
+    fi
+}
+
 main() {
     log_info "Moltbot Update Script"
     echo ""
@@ -178,6 +191,7 @@ main() {
     check_user_exists
     update_moltbot
     retune_service_resources
+    apply_fallback_config
     restart_service
 
     if wait_for_healthy; then
