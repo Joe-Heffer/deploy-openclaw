@@ -2,6 +2,11 @@
 
 Welcome to the OpenClaw documentation. This directory contains guides for use cases, deployment options, security, community applications, and cost information.
 
+## Official Documentation
+
+The primary source for OpenClaw/Moltbot documentation is:
+- **[OpenClaw Documentation](https://docs.openclaw.ai)** — Main documentation hub with index, architecture, installation, and configuration reference
+
 ## Quick Links
 
 ### Getting Started
