@@ -1,23 +1,22 @@
-# Moltbot Deployment
+# OpenClaw Deployment
 
 [![Deploy to VPS](https://github.com/Joe-Heffer/moltbot/actions/workflows/deploy.yml/badge.svg)](https://github.com/Joe-Heffer/moltbot/actions/workflows/deploy.yml)
 [![Lint](https://github.com/Joe-Heffer/moltbot/actions/workflows/lint.yml/badge.svg)](https://github.com/Joe-Heffer/moltbot/actions/workflows/lint.yml)
 
-Deployment scripts and configuration for running [Moltbot](https://molt.bot) (formerly Clawdbot) on Linux VPS.
+Deployment scripts and configuration for running [OpenClaw](https://openclaw.ai) (formerly ClawdBot) on Linux VPS.
 
-## What is Moltbot?
+## What is OpenClaw?
 
-Moltbot is a personal AI assistant that runs on your own hardware. It connects to messaging platforms you already use (WhatsApp, Telegram, Slack, Discord, etc.) and can perform tasks, manage your calendar, browse the web, organize files, and run terminal commands.
+OpenClaw is a personal AI assistant that runs on your own hardware. It connects to messaging platforms you already use (WhatsApp, Telegram, Slack, Discord, etc.) and can perform tasks, manage your calendar, browse the web, organize files, and run terminal commands.
 
-- **Official Documentation**: https://docs.openclaw.ai
-- **Moltbot Documentation**: https://docs.molt.bot
+- **Documentation**: https://docs.openclaw.ai
 - **GitHub**: https://github.com/openclaw/openclaw
 
 ## Prerequisites
 
 - Ubuntu Linux 24.04 LTS
 - Root/sudo access
-- At least 2 GB RAM (4 GB recommended); see the [official system requirements](https://docs.molt.bot/help/faq)
+- At least 2 GB RAM (4 GB recommended); see the [official system requirements](https://docs.openclaw.ai/help/faq)
 - An API key from [Anthropic](https://console.anthropic.com/) or [OpenAI](https://platform.openai.com/)
 
 > **Low-memory VPS**: The installer automatically detects available RAM and
@@ -192,7 +191,7 @@ http://<your-vm-ip>:18789
 
 ### Gateway Token
 
-The Gateway UI requires an authentication token. The onboarding wizard (`moltbot onboard`) generates this token automatically and stores it in the Moltbot config file.
+The Gateway UI requires an authentication token. The onboarding wizard (`moltbot onboard`) generates this token automatically and stores it in the OpenClaw config file.
 
 To retrieve the token:
 
@@ -210,7 +209,7 @@ Or paste the token into the **Overview > Gateway Access** panel in the dashboard
 
 For full setup instructions including firewall configuration, secure remote access, and troubleshooting, see the [Gateway UI Setup Guide](docs/GATEWAY_UI.md).
 
-For secure remote access, consider using [Tailscale Serve/Funnel](https://docs.molt.bot/gateway/tailscale).
+For secure remote access, consider using [Tailscale Serve/Funnel](https://docs.openclaw.ai/gateway/tailscale).
 
 ## Security Recommendations
 
@@ -238,7 +237,7 @@ That said, consider the trade-offs before deciding:
 **Reasons to keep it public:**
 
 - **No secrets in the repo.** All credentials (API keys, SSH keys, hostnames) live in `.env` files or GitHub Actions secrets, not in version-controlled code. The `.env.template` contains only empty placeholders.
-- **Community benefit.** Others deploying Moltbot can reuse and improve these scripts. Public visibility also invites bug reports, security audits, and contributions.
+- **Community benefit.** Others deploying OpenClaw can reuse and improve these scripts. Public visibility also invites bug reports, security audits, and contributions.
 - **Security through obscurity is not a defence.** The deployment patterns here (systemd hardening, SSH-based CI/CD, dedicated service user) are standard. Hiding them does not make your server safer; properly configuring them does.
 
 **Reasons to keep it private:**
@@ -251,7 +250,7 @@ That said, consider the trade-offs before deciding:
 
 ## Low-Memory VPS
 
-The minimum RAM for running Moltbot is 2 GB (see [official system requirements](https://docs.molt.bot/help/faq)). Systems with 1 GB RAM do not have enough memory for the Node.js runtime, V8 heap, and channel connections combined — the OOM killer will terminate the gateway under normal operation.
+The minimum RAM for running OpenClaw is 2 GB (see [official system requirements](https://docs.openclaw.ai/help/faq)). Systems with 1 GB RAM do not have enough memory for the Node.js runtime, V8 heap, and channel connections combined — the OOM killer will terminate the gateway under normal operation.
 
 The installer automatically tunes resource limits based on detected RAM:
 
@@ -312,13 +311,13 @@ sudo systemctl daemon-reload
 sudo -u moltbot -i moltbot doctor
 ```
 
-## Updating Moltbot
+## Updating OpenClaw
 
 ```bash
 # Stop the service
 sudo systemctl stop moltbot-gateway
 
-# Update moltbot
+# Update OpenClaw
 sudo -u moltbot -i npm update -g moltbot
 
 # Start the service
@@ -338,11 +337,11 @@ sudo ./deploy/uninstall.sh
 
 ## Resources
 
-- [Moltbot Documentation](https://docs.molt.bot)
-- [Getting Started Guide](https://docs.molt.bot/start/getting-started)
-- [Security Guide](https://docs.molt.bot/gateway/security)
-- [Channels Configuration](https://docs.molt.bot/channels)
-- [Skills Platform](https://docs.molt.bot/tools/skills)
+- [OpenClaw Documentation](https://docs.openclaw.ai)
+- [Getting Started Guide](https://docs.openclaw.ai/start/getting-started)
+- [Security Guide](https://docs.openclaw.ai/gateway/security)
+- [Channels Configuration](https://docs.openclaw.ai/channels)
+- [Skills Platform](https://docs.openclaw.ai/tools/skills)
 
 ## License
 

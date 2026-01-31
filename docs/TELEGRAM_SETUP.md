@@ -1,13 +1,13 @@
 # Telegram Setup
 
-Connect Moltbot to Telegram so you can chat with your assistant from any Telegram client.
+Connect OpenClaw to Telegram so you can chat with your assistant from any Telegram client.
 
-> **Official guide:** <https://docs.molt.bot/channels/telegram>
+> **Official guide:** <https://docs.openclaw.ai/channels/telegram>
 > — covers features, group chat options, and advanced configuration.
 
 ## Prerequisites
 
-- A working Moltbot deployment (see [Deployment Guide](./DEPLOYMENT.md))
+- A working OpenClaw deployment (see [Deployment Guide](./DEPLOYMENT.md))
 - A Telegram account
 
 ## Step 1: Create a Bot with BotFather
@@ -20,7 +20,7 @@ Connect Moltbot to Telegram so you can chat with your assistant from any Telegra
 
 ## Step 2: Configure the Token on Your Server
 
-SSH into your VPS and edit the Moltbot environment file:
+SSH into your VPS and edit the OpenClaw environment file:
 
 ```bash
 sudo -u moltbot nano /home/moltbot/.config/moltbot/.env
@@ -54,7 +54,7 @@ you are messaging the bot, you will see a **pairing prompt** instead of a
 normal reply:
 
 ```
-Moltbot: access not configured.
+OpenClaw: access not configured.
 
 Your Telegram user id: 123456789
 
@@ -76,7 +76,7 @@ The most common cause is a mistyped bot token.
 
 ## Step 5: Approve the Pairing Request
 
-Moltbot ships with `DM_POLICY=pairing` enabled by default (see
+OpenClaw ships with `DM_POLICY=pairing` enabled by default (see
 [Security Guide](./SECURITY.md)). Every new contact must be approved before
 the bot will respond to them. This prevents strangers from using your bot if
 they discover its Telegram username.
