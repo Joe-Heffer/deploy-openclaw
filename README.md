@@ -17,7 +17,7 @@ OpenClaw is a personal AI assistant that runs on your own hardware. It connects 
 - Ubuntu Linux 24.04 LTS
 - Root/sudo access
 - At least 2 GB RAM (4 GB recommended); see the [official system requirements](https://docs.openclaw.ai/help/faq)
-- An API key from [Anthropic](https://console.anthropic.com/) or [OpenAI](https://platform.openai.com/)
+- An API key from [Anthropic](https://console.anthropic.com/), [OpenAI](https://platform.openai.com/), or [Google Gemini](https://aistudio.google.com/apikey)
 
 > **Low-memory VPS**: The installer automatically detects available RAM and
 > tunes `MemoryMax` and Node.js heap size accordingly. Systems with less than
@@ -51,6 +51,7 @@ The `install.sh` script performs the following:
 4. Installs moltbot globally via npm
 5. Configures a systemd service for automatic startup
 6. Opens port 18789 in the firewall (if firewalld is active)
+7. Sets up AI provider fallback configuration (automatic retry on failures)
 
 ## Directory Structure
 
@@ -60,8 +61,11 @@ deploy/
 ├── update.sh               # Update script for CI/CD
 ├── setup-server.sh         # One-time server preparation for CI/CD
 ├── uninstall.sh            # Removal script
+├── configure-fallbacks.sh  # AI provider fallback configuration script
+├── lib.sh                  # Shared library functions
 ├── moltbot-gateway.service # Systemd service file (reference)
-└── moltbot.env.template    # Environment variable template
+├── moltbot.env.template    # Environment variable template
+└── moltbot.fallbacks.json  # AI provider fallback configuration
 
 .github/workflows/
 ├── deploy.yml              # GitHub Actions deployment workflow (with environment tracking)
@@ -133,10 +137,38 @@ Go to `Actions` > `Deploy to VPS` > `Run workflow` and choose:
 
 ## Configuration
 
-### 1. Run Onboarding
+### 1. Choose Your AI Provider
+
+Moltbot is **model-agnostic** and supports multiple AI providers. You can configure one or more:
+
+| Provider | Recommended Use | API Key Link | Notes |
+|----------|----------------|--------------|-------|
+| **Anthropic** | Production use | [console.anthropic.com](https://console.anthropic.com/) | Recommended - Claude Opus 4.5 offers best performance |
+| **OpenAI** | Alternative | [platform.openai.com](https://platform.openai.com/api-keys) | GPT-4 and GPT-3.5 models |
+| **Google Gemini** | Alternative | [aistudio.google.com](https://aistudio.google.com/apikey) | Gemini Pro and Ultra models |
+
+Unlike ChatGPT's usage limits, you control your own API keys and rate limits. Multiple providers can be configured simultaneously for redundancy.
+
+#### Automatic Failover
+
+The deployment automatically configures **model fallbacks** based on your available API keys:
+
+1. **Primary Model**: Anthropic Claude Opus 4.5 (if `ANTHROPIC_API_KEY` is set)
+2. **Fallback 1**: OpenAI GPT-4 (if `OPENAI_API_KEY` is set)
+3. **Fallback 2**: Google Gemini Pro (if `GEMINI_API_KEY` is set)
+
+If the primary model fails (rate limits, API errors, etc.), Moltbot automatically switches to the next available fallback. This ensures **continuous operation** even during API outages or rate limiting.
+
+**Customize Fallbacks**: Edit `~/.config/moltbot/moltbot.fallbacks.json` to change the provider priority or add additional models, then run:
+
+```bash
+sudo /opt/moltbot-deployment/deploy/configure-fallbacks.sh
+```
+
+### 2. Run Onboarding
 
 The onboarding wizard guides you through:
-- LLM provider setup (Anthropic recommended)
+- LLM provider setup (choose from Anthropic, OpenAI, or Google Gemini)
 - Workspace configuration
 - Channel connections (WhatsApp, Telegram, etc.)
 - Skills installation
@@ -145,7 +177,7 @@ The onboarding wizard guides you through:
 sudo -u moltbot -i moltbot onboard
 ```
 
-### 2. Environment Variables
+### 3. Environment Variables
 
 Copy the template and configure your API keys:
 
@@ -155,8 +187,10 @@ sudo -u moltbot nano /home/moltbot/.config/moltbot/.env
 ```
 
 Key settings:
-- `ANTHROPIC_API_KEY` - Your Anthropic API key (recommended)
-- `OPENAI_API_KEY` - Alternative: OpenAI API key
+- **AI Provider** (choose one or more):
+  - `ANTHROPIC_API_KEY` - Anthropic Claude API key (recommended for Claude Opus 4.5)
+  - `OPENAI_API_KEY` - OpenAI API key (GPT models)
+  - `GEMINI_API_KEY` - Google Gemini API key
 - `MOLTBOT_PORT` - Gateway port (default: 18789)
 
 ## Service Management

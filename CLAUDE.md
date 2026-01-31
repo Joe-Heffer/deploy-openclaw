@@ -14,9 +14,11 @@ deploy/               Bash deployment scripts
   update.sh           CI/CD update script
   uninstall.sh        Removal script
   setup-server.sh     One-time CI/CD server preparation
+  configure-fallbacks.sh   AI provider fallback configuration script
   lib.sh              Shared library (logging, root check, port validation, swap helpers)
   moltbot-gateway.service  Systemd service template
   moltbot.env.template     Environment variable template
+  moltbot.fallbacks.json   AI provider fallback configuration template
 
 .github/workflows/
   deploy.yml          GitHub Actions: deploy to VPS via SSH (with version tracking)

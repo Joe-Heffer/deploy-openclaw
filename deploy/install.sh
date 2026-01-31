@@ -343,6 +343,27 @@ copy_env_template() {
             log_info "Existing .env file preserved at ${MOLTBOT_CONFIG_DIR}/.env"
         fi
     fi
+
+    # Copy fallback configuration template
+    if [[ -f "${SCRIPT_DIR}/moltbot.fallbacks.json" ]]; then
+        cp "${SCRIPT_DIR}/moltbot.fallbacks.json" "${MOLTBOT_CONFIG_DIR}/moltbot.fallbacks.json"
+        chown "${MOLTBOT_USER}:${MOLTBOT_USER}" "${MOLTBOT_CONFIG_DIR}/moltbot.fallbacks.json"
+        log_success "Fallback configuration template copied to ${MOLTBOT_CONFIG_DIR}"
+    fi
+}
+
+setup_model_fallbacks() {
+    log_info "Setting up AI provider fallbacks..."
+
+    if [[ -f "${SCRIPT_DIR}/configure-fallbacks.sh" ]]; then
+        # Run fallback configuration script
+        # This will only configure fallbacks if API keys are present
+        "${SCRIPT_DIR}/configure-fallbacks.sh" || {
+            log_warn "Fallback configuration will be applied after onboarding"
+        }
+    else
+        log_warn "Fallback configuration script not found, skipping"
+    fi
 }
 
 print_next_steps() {
@@ -408,6 +429,9 @@ main() {
 
     INSTALL_PHASE="environment template"
     copy_env_template
+
+    INSTALL_PHASE="model fallback configuration"
+    setup_model_fallbacks
 
     # Clear phase — installation succeeded
     INSTALL_PHASE=""

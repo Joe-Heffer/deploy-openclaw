@@ -1,0 +1,39 @@
+{
+  "description": "Moltbot AI Provider Fallback Configuration",
+  "models": {
+    "primary": {
+      "provider": "anthropic",
+      "model": "claude-opus-4.5",
+      "description": "Anthropic Claude Opus 4.5 - Recommended for best performance",
+      "requiresApiKey": "ANTHROPIC_API_KEY"
+    },
+    "fallbacks": [
+      {
+        "provider": "openai",
+        "model": "gpt-4",
+        "description": "OpenAI GPT-4 - High quality alternative",
+        "requiresApiKey": "OPENAI_API_KEY"
+      },
+      {
+        "provider": "google",
+        "model": "gemini-pro",
+        "description": "Google Gemini Pro - Additional fallback option",
+        "requiresApiKey": "GEMINI_API_KEY"
+      }
+    ]
+  },
+  "imageModels": {
+    "primary": {
+      "provider": "openai",
+      "model": "dall-e-3",
+      "description": "OpenAI DALL-E 3 for image generation",
+      "requiresApiKey": "OPENAI_API_KEY"
+    },
+    "fallbacks": []
+  },
+  "settings": {
+    "autoConfigureOnInstall": true,
+    "skipIfNoApiKeys": true,
+    "preserveExistingConfig": false
+  }
+}
