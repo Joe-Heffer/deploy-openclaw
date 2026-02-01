@@ -29,6 +29,7 @@ Welcome to the OpenClaw deployment documentation. This directory contains guides
 - **[Troubleshooting](./TROUBLESHOOTING.md)** — Common issues and solutions
 - **[Use Cases](./USE_CASES.md)** — Real-world applications
 - **[Cost Expectations](./COST_EXPECTATIONS.md)** — Pricing and budget planning
+- **[Local LLM Backup Options](./LOCAL_LLM_BACKUP.md)** — Using local LLMs on CPU-only VPS
 - **[Community Applications](./COMMUNITY_APPLICATIONS.md)** — Examples from the community
 
 ## Recommended Reading Order
@@ -89,6 +90,7 @@ docs/
 ├── TROUBLESHOOTING.md                 (common issues)
 ├── USE_CASES.md                       (real-world applications)
 ├── COST_EXPECTATIONS.md               (pricing guide)
+├── LOCAL_LLM_BACKUP.md                (local LLM feasibility and alternatives)
 └── COMMUNITY_APPLICATIONS.md          (community examples)
 ```
 
