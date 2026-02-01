@@ -1,6 +1,12 @@
 name: Release
 
 on:
+  push:
+    branches:
+      - main
+    # Don't trigger on VERSION file commits to prevent recursion
+    paths-ignore:
+      - 'VERSION'
   workflow_dispatch:
     inputs:
       version_type:
@@ -29,7 +35,37 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check if release needed
+        id: check
+        run: |
+          # Skip check for manual workflow runs
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "Manual workflow trigger - proceeding with release"
+            exit 0
+          fi
+
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"%s")
+          else
+            COMMITS=$(git log "$LAST_TAG"..HEAD --pretty=format:"%s")
+          fi
+
+          # Check if any release-worthy commits exist (feat:, fix:, or BREAKING CHANGE)
+          if echo "$COMMITS" | grep -qE '^(feat|fix|BREAKING CHANGE)'; then
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "Release-worthy commits found:"
+            echo "$COMMITS" | grep -E '^(feat|fix|BREAKING CHANGE)'
+          else
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            echo "No release-worthy commits found (only docs/chore/ci changes). Skipping release."
+          fi
+
       - name: Get current version
+        if: steps.check.outputs.should_release == 'true'
         id: current
         run: |
           CURRENT_VERSION=$(cat VERSION)
@@ -37,6 +73,7 @@ jobs:
           echo "Current version: $CURRENT_VERSION"
 
       - name: Analyze commits for version bump
+        if: steps.check.outputs.should_release == 'true'
         id: analyze
         run: |
           set +e
@@ -52,10 +89,10 @@ jobs:
             COMMITS=$(git log "$LAST_TAG"..HEAD --oneline --pretty=format:"%s")
           fi
 
-          # Determine version bump type
-          VERSION_TYPE="${{ github.event.inputs.version_type }}"
+          # Determine version bump type (default to auto for push events)
+          VERSION_TYPE="${{ github.event.inputs.version_type || 'auto' }}"
 
-          if [ "$VERSION_TYPE" = "auto" ]; then
+          if [ "$VERSION_TYPE" = "auto" ] || [ -z "$VERSION_TYPE" ]; then
             # Auto-detect from commit messages
             if echo "$COMMITS" | grep -iq "^BREAKING CHANGE"; then
               VERSION_TYPE="major"
@@ -74,6 +111,7 @@ jobs:
           echo "$COMMITS"
 
       - name: Calculate next version
+        if: steps.check.outputs.should_release == 'true'
         id: next
         run: |
           CURRENT_VERSION="${{ steps.current.outputs.version }}"
@@ -102,11 +140,13 @@ jobs:
           echo "Next version: $NEXT_VERSION"
 
       - name: Update VERSION file
+        if: steps.check.outputs.should_release == 'true'
         run: |
           echo "${{ steps.next.outputs.next_version }}" > VERSION
           cat VERSION
 
       - name: Commit and tag
+        if: steps.check.outputs.should_release == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -116,11 +156,13 @@ jobs:
           git tag -a "v${{ steps.next.outputs.next_version }}" -m "Release version ${{ steps.next.outputs.next_version }}"
 
       - name: Push changes and tags
+        if: steps.check.outputs.should_release == 'true'
         run: |
           git push origin HEAD:main
           git push origin "v${{ steps.next.outputs.next_version }}"
 
       - name: Generate release notes
+        if: steps.check.outputs.should_release == 'true'
         id: release_notes
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -143,6 +185,7 @@ jobs:
           cat release_notes.md
 
       - name: Create GitHub Release
+        if: steps.check.outputs.should_release == 'true'
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
         with:
           tag: v${{ steps.next.outputs.next_version }}
