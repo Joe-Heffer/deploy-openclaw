@@ -575,6 +575,13 @@ wait_for_healthy() {
             journalctl -u "$SERVICE_NAME" --no-pager -n 5 2>/dev/null || true
             last_pid=""
             if [[ "$restarts" -ge "$max_restarts" ]]; then
+                # Check if the crash loop is due to missing configuration
+                if journalctl -u "$SERVICE_NAME" --no-pager -n 20 2>/dev/null \
+                   | grep -q "Missing config"; then
+                    log_warn "Service crashed ${restarts} times due to missing configuration"
+                    systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+                    return 2  # special code: missing config
+                fi
                 log_error "Service crashed ${restarts} times — giving up (crash loop)"
                 log_info "Full recent logs:"
                 journalctl -u "$SERVICE_NAME" --no-pager -n 30 2>/dev/null || true
@@ -595,6 +602,13 @@ wait_for_healthy() {
                 echo ""
                 log_warn "Service restarted during health check (PID ${last_pid} -> ${current_pid}, #${restarts})"
                 if [[ "$restarts" -ge "$max_restarts" ]]; then
+                    # Check if the crash loop is due to missing configuration
+                    if journalctl -u "$SERVICE_NAME" --no-pager -n 20 2>/dev/null \
+                       | grep -q "Missing config"; then
+                        log_warn "Service crashed ${restarts} times due to missing configuration"
+                        systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+                        return 2  # special code: missing config
+                    fi
                     log_error "Service crashed ${restarts} times — giving up (crash loop)"
                     log_info "Full recent logs:"
                     journalctl -u "$SERVICE_NAME" --no-pager -n 30 2>/dev/null || true
@@ -778,13 +792,31 @@ main() {
     DEPLOY_PHASE="service restart"
     restart_service
 
-    if wait_for_healthy; then
+    local health_rc=0
+    wait_for_healthy || health_rc=$?
+
+    if [[ "$health_rc" -eq 0 ]]; then
         run_doctor
         show_status
         if [[ "$SERVICE_WAS_RUNNING" == false ]]; then
             print_first_install_steps
         fi
         log_success "Deployment completed successfully"
+    elif [[ "$health_rc" -eq 2 ]]; then
+        # Missing configuration — expected on first install.
+        # The service has been stopped to prevent the crash loop.
+        if [[ "$SERVICE_WAS_RUNNING" == false ]]; then
+            print_first_install_steps
+            log_success "Deployment completed — configure OpenClaw to start the service"
+        else
+            show_status
+            log_error "Service configuration is missing or broken"
+            log_info "Re-run the onboarding wizard:"
+            log_info "  sudo -u ${OPENCLAW_USER} -i openclaw onboard"
+            log_info "Then restart the service:"
+            log_info "  sudo systemctl restart ${SERVICE_NAME}"
+            exit 1
+        fi
     else
         show_status
         log_error "Deployment completed but service may not be healthy"
