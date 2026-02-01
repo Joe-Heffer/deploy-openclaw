@@ -51,6 +51,11 @@ The primary source for OpenClaw/Moltbot documentation is:
   - 2025-2026 AI chatbot policy changes
   - Platform comparison (Discord, Telegram, Slack, Signal)
 
+- **[Agent Memory Backup](./AGENT_MEMORY_BACKUP.md)** - Automated backups to prevent data loss
+  - Git repository backups
+  - Cloud storage backups via rclone
+  - Privacy considerations and security
+
 - **[Troubleshooting](./TROUBLESHOOTING.md)** - Common issues and how to fix them
   - Missing config crash loop
   - Health check failures
@@ -102,6 +107,7 @@ docs/
 ├── USE_CASES.md                   (use cases by category)
 ├── DEPLOYMENT.md                  (deployment options)
 ├── SECURITY.md                    (security hardening)
+├── AGENT_MEMORY_BACKUP.md         (agent memory backup guide)
 ├── COMMUNITY_APPLICATIONS.md      (community examples)
 ├── GATEWAY_UI.md                  (gateway web interface setup)
 ├── TELEGRAM_SETUP.md              (Telegram bot setup guide)
