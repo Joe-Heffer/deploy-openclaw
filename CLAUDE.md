@@ -1,41 +1,19 @@
 # CLAUDE.md
 
-This file provides context for AI assistants working on this repository.
+Project-specific instructions for AI assistants working on this repository.
 
 ## Project Overview
 
 OpenClaw deployment repository — Bash scripts, CI/CD workflows, and documentation for running [OpenClaw](https://openclaw.ai) on Linux VPS. This repo does **not** contain the OpenClaw application itself (installed via `npm install -g moltbot`).
 
-## Repository Structure
+**Repository type**: Scripts and documentation only (no build step, no test suite).
 
-```
-deploy/               Bash deployment scripts
-  deploy.sh           Idempotent deployment (install + update, always regenerates systemd service)
-  uninstall.sh        Removal script
-  setup-server.sh     One-time CI/CD server preparation
-  configure-fallbacks.sh   AI provider fallback configuration script
-  backup-agent-memory.sh   Agent memory and configuration backup script
-  lib.sh              Shared library (logging, root check, port validation, swap helpers)
-  moltbot-gateway.service  Systemd service template
-  moltbot-backup.service   Systemd backup service
-  moltbot-backup.timer     Systemd backup timer (daily at 3 AM)
-  moltbot.env.template     Environment variable template
-  moltbot.fallbacks.json   AI provider fallback configuration template
-  backup.conf.template     Backup configuration template
+## Finding Your Way Around
 
-.github/workflows/
-  deploy.yml          GitHub Actions: deploy to VPS via SSH (with version tracking)
-  release.yml         GitHub Actions: create releases with semantic versioning
-  lint.yml            GitHub Actions: ShellCheck, actionlint, yamllint
-
-docs/                 Extended documentation (use cases, deployment, security, costs, backup)
-  AGENT_MEMORY_BACKUP.md  Agent memory backup guide
-README.md             Quick start and reference
-CONTRIBUTING.md       Contribution guidelines (includes conventional commit format)
-RELEASING.md          Release versioning and process documentation
-VERSION               Current semantic version (e.g., 0.1.0)
-LICENSE               MIT License
-```
+- **Deployment scripts**: `deploy/` directory contains all bash scripts and systemd templates
+- **CI/CD workflows**: `.github/workflows/` for GitHub Actions
+- **Documentation**: Extended guides in `docs/` directory
+- **Key files**: `@README.md` for quick start, `@CONTRIBUTING.md` for commit format, `@RELEASING.md` for versioning process
 
 ## Key Commands
 
@@ -51,59 +29,70 @@ There is no build step or test suite — this is a scripts-and-docs repository.
 
 ## Development Conventions
 
-- **Bash scripts**: Use `set -euo pipefail`. Source `deploy/lib.sh` for logging (`log_info`, `log_success`, `log_warn`, `log_error`) and utilities (`require_root`, `validate_port`). Support Debian/Ubuntu and RHEL-family.
-- **GitHub Actions**: Pin actions to full commit SHAs with version comments.
-- **YAML**: Lines under 200 characters. yamllint config extends `default` with relaxed `truthy` and `comments` rules.
-- **Commit messages**: Use **conventional commits** format for automated versioning (see CONTRIBUTING.md and RELEASING.md):
-  - `feat:` → MINOR version bump
-  - `fix:` → PATCH version bump
-  - `docs:`, `chore:`, `ci:` → no version bump
-  - `BREAKING CHANGE:` or `!` suffix → MAJOR version bump
-- **Documentation**: Markdown in `docs/`, linked from `docs/README.md`. Keep top-level `README.md` focused.
+### Bash Scripts
+- ALWAYS use `set -euo pipefail` at the top of scripts
+- Source `deploy/lib.sh` for logging functions (`log_info`, `log_success`, `log_warn`, `log_error`) and utilities (`require_root`, `validate_port`)
+- Must support both Debian/Ubuntu and RHEL-family distributions
+- Never hardcode paths that vary across distributions — use detection logic
+
+### GitHub Actions
+- Pin actions to **full commit SHAs** with version comments (e.g., `uses: actions/checkout@a1b2c3d4 # v4.1.0`)
+- NEVER use mutable tags like `@v4` or `@main`
+
+### YAML
+- Lines under 200 characters
+- yamllint config extends `default` with relaxed `truthy` and `comments` rules
+
+### Commit Messages (CRITICAL for versioning)
+Use **conventional commits** format — automated release process depends on this:
+- `feat:` → MINOR version bump
+- `fix:` → PATCH version bump
+- `docs:`, `chore:`, `ci:` → no version bump
+- `BREAKING CHANGE:` in footer or `!` suffix → MAJOR version bump
+- See `@CONTRIBUTING.md` and `@RELEASING.md` for details
+
+### Documentation
+- Extended documentation goes in `docs/` directory
+- Keep `README.md` focused on quick start and deployment
+- Link to detailed guides rather than duplicating content
 
 ## Versioning & Releases
 
-This repository uses **semantic versioning** (MAJOR.MINOR.PATCH) starting at 0.1.0:
+**Semantic versioning** (MAJOR.MINOR.PATCH) starting at 0.1.0:
 
-- **VERSION file**: Single source of truth, contains current version (e.g., `0.1.0`)
-- **Git tags**: Release tags follow format `v0.1.0`, `v0.2.0`, etc.
-- **Release workflow** (`.github/workflows/release.yml`): Automated releases triggered via Actions workflow:
-  - Analyzes commits since last release using conventional commit format
-  - Auto-detects version bump (major/minor/patch)
+- **VERSION file**: Single source of truth (`0.1.0`)
+- **Git tags**: Format `v0.1.0`, `v0.2.0`, etc.
+- **Release workflow**: `.github/workflows/release.yml` automates releases:
+  - Analyzes commits since last release (conventional commit format required)
+  - Auto-detects version bump type
   - Updates VERSION file, creates git tag, generates GitHub Release
-  - Can also manually specify version bump type
-- **Deployment tracking**: Each deploy captures the VERSION from the repo and stores it on the VPS at `/opt/moltbot-version` for tracking which version is deployed
-- **Squash commits**: Use "squash and merge" on PRs to keep release history clean and aid commit analysis
+- **Deployment tracking**: VERSION stored at `/opt/moltbot-version` on deployed VPS
+- **PR workflow**: ALWAYS use "squash and merge" to keep release history clean
 
-See [RELEASING.md](../RELEASING.md) for the complete release process, and [CONTRIBUTING.md](../CONTRIBUTING.md) for commit message format.
+See `@RELEASING.md` for complete release process.
 
-## Architecture Notes
+## Deployment Architecture
 
-- **Target OS**: Ubuntu 24.04 LTS (also supports RHEL/Oracle Linux)
-- **Node.js**: v22 via NodeSource
-- **System user**: `moltbot` (non-root, created by deploy script)
-- **Service**: `moltbot-gateway` systemd unit on port 18789
-- **Security**: `NoNewPrivileges`, `ProtectSystem=strict`, `ProtectHome=read-only`, dedicated user
-- **Low-memory**: Auto-tunes `MemoryMax` and `--max-old-space-size`; temporary swap for installs on <4 GB RAM; minimum 2 GB RAM enforced by deploy script
+**Target environment**: Ubuntu 24.04 LTS (RHEL/Oracle Linux also supported)
 
-## Official Documentation Links
+**Critical deployment details**:
+- Node.js v22 via NodeSource repositories
+- Dedicated `moltbot` system user (non-root, created by deploy script)
+- Service runs as `moltbot-gateway` systemd unit on port 18789
+- Hardened systemd security: `NoNewPrivileges`, `ProtectSystem=strict`, `ProtectHome=read-only`
+- Low-memory optimization: auto-tunes `MemoryMax` and `--max-old-space-size`; creates temporary swap on <4GB RAM; **minimum 2GB RAM required**
 
-For solving problems and understanding OpenClaw/Moltbot features, refer to the official documentation:
+## Where to Find Information
 
-### Core Resources
-- **[OpenClaw Documentation](https://docs.openclaw.ai/)** — Main documentation hub (index, architecture, configuration reference)
-- **[OpenClaw GitHub](https://github.com/openclaw/openclaw)** — Source code, issues, and discussions
-- **[OpenClaw Website](https://openclaw.ai/)** — Product overview and features
+**For OpenClaw/Moltbot features and troubleshooting**, use progressive disclosure:
+- Primary: [OpenClaw Documentation](https://docs.openclaw.ai/) — architecture, configuration, channels
+- Source: [OpenClaw GitHub](https://github.com/openclaw/openclaw) — issues, discussions, source code
+- Product: [OpenClaw Website](https://openclaw.ai/) — overview and features
 
-### Relevant Documentation Sections
-- **[Gateway UI Guide](https://docs.openclaw.ai/)** — Browser control panel (chat, config, nodes, sessions)
-- **[Channel Configuration](https://docs.openclaw.ai/)** — WhatsApp, Telegram, Discord, Slack, Signal, iMessage, Teams, Matrix, and other channel setup
-- **[Installation & Onboarding](https://docs.openclaw.ai/)** — Global npm install, configuration, service management
-- **[Architecture Overview](https://docs.openclaw.ai/)** — Gateway + protocol model, design patterns
-- **[Configuration Reference](https://docs.openclaw.ai/)** — Complete environment variables and settings
+**For deployment questions**, check these files first:
+- `@README.md` — Quick start and deployment instructions
+- `@docs/DEPLOYMENT.md` — Multi-platform deployment options
+- `@docs/SECURITY.md` — Security hardening and risk assessment
+- `@docs/TROUBLESHOOTING.md` — Common issues and solutions
 
-### Related Deployment Guides
-- **[README.md](README.md)** — Quick start and deployment instructions
-- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — Multi-platform deployment options
-- **[docs/SECURITY.md](docs/SECURITY.md)** — Security hardening and risk assessment
-- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** — Common issues and solutions
+When uncertain about how something works, explore the codebase or documentation before making assumptions.
