@@ -13,6 +13,8 @@ Environment=NODE_ENV=production
 Environment=NODE_OPTIONS=--max-old-space-size={{NODE_HEAP_SIZE}}
 Environment=PATH={{BREW_PREFIX}}/bin:{{BREW_PREFIX}}/sbin:{{MOLTBOT_HOME}}/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
 Environment=HOME={{MOLTBOT_HOME}}
+Environment=OPENCLAW_STATE_DIR={{MOLTBOT_HOME}}/clawd
+Environment=OPENCLAW_WORKSPACE_DIR={{MOLTBOT_HOME}}/clawd
 Environment=HOMEBREW_PREFIX={{BREW_PREFIX}}
 Environment=HOMEBREW_CELLAR={{BREW_PREFIX}}/Cellar
 Environment=HOMEBREW_REPOSITORY={{BREW_PREFIX}}/Homebrew

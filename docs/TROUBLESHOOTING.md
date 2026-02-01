@@ -152,6 +152,8 @@ sudo journalctl -u moltbot-gateway -n 50 --no-pager | grep -i "chat"
 No API key found for provider 'openai-codex'. Auth store: /home/moltbot/.clawdbot/agents/main/agent/auth-profiles.json
 ```
 
+> **Note:** If you see `.clawdbot` in the error path instead of `clawd`, this was caused by missing environment variables in older deployment configurations. The systemd service now sets `OPENCLAW_STATE_DIR=/home/moltbot/clawd` to use the correct workspace directory. This issue was related to the project's rename history (clawbot → moltbot → openclaw). **Fix:** Redeploy with `sudo bash deploy/deploy.sh` to update the systemd service configuration.
+
 The agent crashes instead of gracefully handling the missing API key.
 
 **Cause:** OpenClaw is attempting to use the "openai-codex" provider (OpenAI's Codex API for code generation) but cannot find authentication credentials. This is an upstream bug in OpenClaw - it should gracefully fall back to another provider or skip the operation instead of crashing.
