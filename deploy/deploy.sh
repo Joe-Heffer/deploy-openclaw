@@ -191,6 +191,7 @@ create_openclaw_user() {
 
     mkdir -p "${OPENCLAW_HOME}/.clawdbot"
     mkdir -p "${OPENCLAW_HOME}/clawd/memory"
+    mkdir -p "${OPENCLAW_HOME}/.openclaw"
 
     # Restore original umask
     umask "$old_umask"
@@ -198,6 +199,7 @@ create_openclaw_user() {
     # Ensure restrictive permissions on sensitive directories
     chmod 700 "${OPENCLAW_HOME}/.clawdbot"
     chmod 700 "${OPENCLAW_HOME}/clawd"
+    chmod 700 "${OPENCLAW_HOME}/.openclaw"
 
     # Ensure npm prefix is configured.
     # Write .npmrc directly to avoid sudo HOME environment issues
