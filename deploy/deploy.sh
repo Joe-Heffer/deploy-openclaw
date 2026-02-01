@@ -600,21 +600,18 @@ print_first_install_steps() {
     echo -e "${LIB_GREEN}OpenClaw installation complete!${LIB_NC}"
     echo "=============================================="
     echo ""
+    echo "The service is now running and enabled to start on boot."
+    echo ""
     echo "Next steps:"
     echo ""
     echo "1. Run the onboarding wizard as the openclaw user:"
     echo "   sudo -u ${OPENCLAW_USER} -i openclaw onboard"
     echo ""
-    echo "2. Start the service:"
-    echo "   sudo systemctl start openclaw-gateway"
-    echo "   sudo systemctl enable openclaw-gateway"
-    echo ""
-    echo "3. Check service status:"
-    echo "   sudo systemctl status openclaw-gateway"
-    echo "   sudo journalctl -u openclaw-gateway -f"
-    echo ""
-    echo "4. Access the Gateway UI at:"
+    echo "2. Access the Gateway UI at:"
     echo "   http://<your-vm-ip>:${OPENCLAW_PORT}"
+    echo ""
+    echo "3. Monitor service logs:"
+    echo "   sudo journalctl -u openclaw-gateway -f"
     echo ""
     echo "Configuration directory: ${OPENCLAW_CONFIG_DIR}"
     echo "Data directory: ${OPENCLAW_DATA_DIR}"
@@ -682,26 +679,24 @@ main() {
     # Clear phase — core deployment succeeded
     DEPLOY_PHASE=""
 
-    # If the service was already running this is an update: restart and
-    # health-check.  On first install, print manual next steps instead
-    # (the user needs to run onboarding before starting the service).
-    if [[ "$SERVICE_WAS_RUNNING" == true ]]; then
-        DEPLOY_PHASE="service restart"
-        restart_service
+    # Start the service and run health checks.
+    # On first install, also print helpful next steps about onboarding.
+    DEPLOY_PHASE="service restart"
+    restart_service
 
-        if wait_for_healthy; then
-            run_doctor
-            show_status
-            log_success "Deployment completed successfully"
-        else
-            show_status
-            log_error "Deployment completed but service may not be healthy"
-            exit 1
+    if wait_for_healthy; then
+        run_doctor
+        show_status
+        if [[ "$SERVICE_WAS_RUNNING" == false ]]; then
+            print_first_install_steps
         fi
-        DEPLOY_PHASE=""
+        log_success "Deployment completed successfully"
     else
-        print_first_install_steps
+        show_status
+        log_error "Deployment completed but service may not be healthy"
+        exit 1
     fi
+    DEPLOY_PHASE=""
 }
 
 main "$@"

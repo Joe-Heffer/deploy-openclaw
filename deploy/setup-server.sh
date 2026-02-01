@@ -163,6 +163,8 @@ print_next_steps() {
     echo "   - Manual: sudo ${DEPLOY_PATH}/deploy/deploy.sh"
     echo "   - GitHub: Trigger 'Deploy to VPS' workflow"
     echo ""
+    echo "   The deployment will automatically start the openclaw-gateway service."
+    echo ""
     echo "4. Complete openclaw onboarding:"
     echo "   sudo -u openclaw -i openclaw onboard"
     echo ""
