@@ -347,6 +347,18 @@ install_openclaw() {
 
     local expected_bin="${OPENCLAW_HOME}/.npm-global/bin/openclaw"
 
+    # Determine where npm actually installed — the global prefix may differ
+    # from what .npmrc requests (e.g. system-level /etc/npmrc override,
+    # NPM_CONFIG_PREFIX env var, or Node.js built-in default).
+    local npm_global_prefix
+    npm_global_prefix=$(sudo -u "$OPENCLAW_USER" -i npm prefix -g 2>/dev/null || true)
+    if [[ -n "$npm_global_prefix" ]]; then
+        log_info "npm global prefix: ${npm_global_prefix}"
+        if [[ "$npm_global_prefix" != "${OPENCLAW_HOME}/.npm-global" ]]; then
+            log_warn "npm global prefix '${npm_global_prefix}' differs from expected '${OPENCLAW_HOME}/.npm-global'"
+        fi
+    fi
+
     # If the binary isn't at the expected path, try to locate it via the
     # openclaw user's login shell (npm may have used a different prefix).
     if [[ ! -e "$expected_bin" ]]; then
@@ -358,6 +370,20 @@ install_openclaw() {
             ln -sf "$actual_bin" "$expected_bin"
             chown -h "${OPENCLAW_USER}:${OPENCLAW_USER}" "$expected_bin"
             log_info "Created symlink: ${expected_bin} -> ${actual_bin}"
+        fi
+    fi
+
+    # Second fallback: check the directory npm reports as its global prefix.
+    # Covers cases where .npmrc prefix is overridden by a system-level config
+    # or environment variable, and the binary is not on the login shell PATH.
+    if [[ ! -e "$expected_bin" && -n "${npm_global_prefix:-}" ]]; then
+        local npm_prefix_bin="${npm_global_prefix}/bin/openclaw"
+        if [[ -x "$npm_prefix_bin" ]]; then
+            log_warn "Found openclaw at ${npm_prefix_bin} (npm prefix: ${npm_global_prefix})"
+            mkdir -p "$(dirname "$expected_bin")"
+            ln -sf "$npm_prefix_bin" "$expected_bin"
+            chown -h "${OPENCLAW_USER}:${OPENCLAW_USER}" "$expected_bin"
+            log_info "Created symlink: ${expected_bin} -> ${npm_prefix_bin}"
         fi
     fi
 
@@ -390,7 +416,11 @@ install_openclaw() {
 
     # Create a symlink in /usr/local/bin so that `openclaw` is on the default
     # PATH for all users and shell types (login, non-login, sudo without -i).
-    ln -sf "$expected_bin" /usr/local/bin/openclaw
+    # Resolve to the final binary target to avoid a broken chain if the
+    # intermediate symlink in .npm-global/bin is recreated by a future install.
+    local resolved_bin
+    resolved_bin=$(readlink -f "$expected_bin" 2>/dev/null || echo "$expected_bin")
+    ln -sf "$resolved_bin" /usr/local/bin/openclaw
 
     local new_version
     new_version=$(sudo -u "$OPENCLAW_USER" -i openclaw --version 2>/dev/null || echo "unknown")
